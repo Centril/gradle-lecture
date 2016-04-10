@@ -1,0 +1,23 @@
+plugins {
+    id 'application'
+}
+
+allprojects {
+	apply plugin: 'java'
+	repositories { jcenter() }
+}
+
+project(':view') {
+	dependencies {
+		compile project(':model')
+    	compile "com.google.guava:guava:18.0"
+	}
+}
+
+dependencies {
+	compile project(':view')
+	//compile project(':model')
+	//not needed due to transitive property.
+}
+
+mainClassName = "example.TreePresentation"
