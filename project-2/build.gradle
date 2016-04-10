@@ -1,0 +1,24 @@
+// Apply java & application plugins:
+plugins {
+    id 'java'
+    id 'application'
+}
+
+// or:
+apply plugin: 'java'
+apply plugin: 'application'
+
+// or:
+['java', 'application'].each { apply plugin: it }
+
+// Application entry point is example.Example
+mainClassName = "example.Example"
+
+// This is just groovy code:
+def increase( x ) { x + 1 }
+
+if ( increase( 1 ) == 2 ) {
+	println "Groovy!"
+	println "-----------------------------------"
+	println ""
+}
