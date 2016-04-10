@@ -1,0 +1,7 @@
+// Apply java plugin:
+plugins {
+    id 'java'
+}
+
+// or:
+apply plugin: 'java'
