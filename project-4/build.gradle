@@ -1,0 +1,10 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+mainClassName = "level0.Level0"
+
+dependencies {
+    compile project(":level1")
+}
