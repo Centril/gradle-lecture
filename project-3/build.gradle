@@ -1,0 +1,24 @@
+// Apply java plugin:
+plugins {
+    id 'java'
+    id 'application'
+}
+
+mainClassName = "example.Example"
+
+repositories {
+    // Use the repository that Maven uses:
+    mavenCentral()
+
+    // Another popular & bigger repository:
+    //jcenter()
+}
+
+// Add some dependenies:
+dependencies {
+    compile "com.google.guava:guava:18.+"
+
+    compile group: 'joda-time', name: 'joda-time', version: '2.9.3'
+
+    testCompile "junit:junit:4.11"
+}
