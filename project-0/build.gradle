@@ -1,0 +1,59 @@
+println "I was executed during Configuration phase."
+
+// This is just groovy code:
+def increase( x ) { x + 1 }
+
+// Let's create a task named "mytask":
+task mytask {
+    doFirst {
+        // Happens first in task.
+        // Executed during Execution phase:
+        println 'I am first!'
+    }
+
+    doLast {
+        // Happens last in task.
+        println 'I am last!'
+
+        if ( increase( 1 ) == 2 ) {
+            println "This is Groovy!"
+        }
+    }
+}
+
+// Task dependencies:
+task buyStuff << { // Shorthand for doLast
+    println "Taken stuff out of fridge."
+}
+
+task cleanStuff {
+    dependsOn buyStuff
+}
+cleanStuff << {
+    println "Cleaned stuff."
+}
+
+task makeFood(dependsOn: cleanStuff) << {
+    println "Food made."
+}
+
+task setTable << {
+    println "All the china is in place."
+}
+
+task serveFood << {
+    println "Food served is, bon apetit!"
+}
+serveFood.dependsOn setTable, makeFood
+
+// Default task:
+task theDefault << {
+    println "I am the default task!"
+}
+defaultTasks 'theDefault'
+
+// Make tasks of a certain type:
+task(copy, type: Copy) {
+    from(file('source'))
+    into(file('destination'))
+}
