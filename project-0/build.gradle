@@ -23,7 +23,7 @@ task mytask {
 
 // Task dependencies:
 task buyStuff << { // Shorthand for doLast
-    println "Taken stuff out of fridge."
+    println "Now I got stuff."
 }
 
 task cleanStuff {
