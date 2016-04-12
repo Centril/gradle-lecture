@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+publishing {
+    publications {
+        example( MavenPublication ) {
+            groupId 'example'
+            artifactId 'example-project'
+            version '0.0.1'
+
+            artifact jar
+            //from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            url "$buildDir/repo"
+        }
+    }
+}
