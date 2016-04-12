@@ -1,0 +1,134 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'maven-publish'
+    id 'jacoco'
+    id "com.github.kt3k.coveralls" version "2.6.3"
+    id "com.jfrog.bintray" version "1.6"
+    id "com.github.hierynomus.license" version "0.12.1"
+    id "com.github.ben-manes.versions" version "0.12.0"
+}
+
+// Config:
+ext.giturl    = "https://github.com/${gitrepo}"
+ext.gitconn   = "scm:git:git@github.com:${gitrepo}.git"
+ext.gitissues = "{$giturl}/issues"
+task wrapper( type: Wrapper ) {
+    gradleVersion = '2.12'
+}
+
+// Tasks for clearing:
+task cleanMaven( type: Delete ) { delete 'maven-deploy' }
+task cleanGradle( type: Delete ) { delete '.gradle' }
+task cleanAll( dependsOn: [clean, cleanGradle, cleanMaven, cleanIdea] ) {}
+task c( dependsOn: cleanAll )
+
+// License:
+license {
+    header = rootProject.file('config/HEADER')
+    strictCheck = true
+    ignoreFailures = false
+    useDefaultMappings = true
+    ext.year = '2016'
+}
+
+// jacoco:
+jacocoTestReport {
+    reports {
+        // coveralls plugin depends on xml format report
+        xml.enabled = true
+        html.enabled = true
+    }
+}
+
+// Dependencies for testing:
+repositories { jcenter() }
+dependencies {
+    testCompile "org.codehaus.groovy:groovy-all:2.4.6"
+    testCompile "org.spockframework:spock-core:1.0-groovy-2.4"
+    testCompile "cglib:cglib-nodep:3.2.2"
+    testCompile "org.objenesis:objenesis:2.2"
+}
+
+// Publishing config:
+
+// -javadoc.jar generation
+task javadocJar( type: Jar, dependsOn: javadoc ) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+publishing {
+    repositories {
+        // Deploy to a local "maven-delpoy" directory.
+        maven { url "maven-deploy" }
+    }
+    publications {
+        proj7Pub( MavenPublication ) {
+            // adds artifacts to project with "-<classifier" as suffix:
+            artifact jar { classifier 'sources' }
+            artifact javadocJar { classifier 'javadoc' }
+
+            // Modify the POM to add various metadata:
+            pom.withXml {
+                asNode().children().last() + {
+                    resolveStrategy = Closure.DELEGATE_FIRST
+                    name projname
+                    description projdesc
+                    url giturl
+                    scm {
+                        url giturl
+                        connection gitconn
+                        developerConnection gitconn
+                    }
+                    inceptionYear '2016'
+                    licenses {
+                        license {
+                            name 'Unlicense'
+                            url 'http://unlicense.org/'
+                            distribution 'repo'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id 'Centril'
+                            name 'Mazdak Farrokhzad'
+                            email 'twingoow@gmail.com'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Bintray config:
+def prop( String propertyName, defaultValue ) {
+    hasProperty( propertyName ) ? getProperty( propertyName ) : defaultValue
+}
+
+bintray {
+    // this usually comes form gradle.properties file in ~/.gradle
+    user = prop( "bintrayUser", '' )
+    key  = prop( "bintrayKey", '' )
+
+    // see publications closure
+    publish             = true
+    publications        = ['proj7Pub']
+    pkg {
+        repo            = 'maven'
+        name            = "${group}:${projname}"
+        desc            = projdesc
+        licenses        = ['Apache-2.0']
+        labels          = ['project7', 'awesome', 'example']
+        websiteUrl      = giturl
+        issueTrackerUrl = gitissues
+        vcsUrl          = giturl
+        version {
+            name        = project.version
+            vcsTag      = project.version
+            released    = new Date()
+            gpg { sign  = true }
+        }
+        publicDownloadNumbers = true
+    }
+}
