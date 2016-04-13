@@ -1,0 +1,30 @@
+// Old way of adding plugins:
+buildscript {
+    repositories { jcenter() }
+    dependencies {
+        // Android plugin:
+        classpath 'com.android.tools.build:gradle:2.0.0'
+    }
+}
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 22
+    buildToolsVersion "23.0.3"
+
+    defaultConfig {
+        applicationId "com.example.myapplication"
+        minSdkVersion 22
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release { minifyEnabled false }
+    }
+}
+
+repositories { jcenter() }
+dependencies {
+    testCompile 'junit:junit:4.12'
+}
